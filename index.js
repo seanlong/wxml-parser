@@ -22,22 +22,30 @@ function XML2DataTree(root, context, newRoot, layerOps, layerIdx) {
 	}
 	var newLayerOps = [];
 	var newLayerIdx = 0;
-	for (var i = 0; i < root.childNodes.length; ++i) {
-		var child = root.childNodes[i];
-		if (child.nodeType != 1 && child.nodeType != 3)
-			continue;
-		if (child.nodeType == 3 && !child.nodeValue.trim().length)
-			continue;
-		if (newNode.items && newNode.array && newNode.array.length) {
-			newNode.array.forEach((n, idx) => {
-				n = n.tag === 'wx-block' ? newRoot : n;
-				var newContext = JSON.parse(JSON.stringify(context));
-				newContext['item'] = newNode.items[idx];
-				newContext['index'] = idx;
-				return XML2DataTree(child, newContext, n, newLayerOps, newLayerIdx++)
-			});
-		} else {
-			newNode = newNode.tag === 'wx-block' ? newRoot : newNode;
+
+	if (newNode.items && newNode.array && newNode.array.length) {
+		newNode.array.forEach((n, idx) => {
+			n = n.tag === 'wx-block' ? newRoot : n;
+			var newContext = JSON.parse(JSON.stringify(context));
+			newContext[newNode.itemName] = newNode.items[idx];
+			newContext[newNode.indexName] = idx;
+			for (var i = 0; i < root.childNodes.length; ++i) {
+				var child = root.childNodes[i];
+				if (child.nodeType != 1 && child.nodeType != 3)
+					continue;
+				if (child.nodeType == 3 && !child.nodeValue.trim().length)
+					continue;
+				XML2DataTree(child, newContext, n, newLayerOps, newLayerIdx++);
+			}
+		});
+	} else {
+		newNode = newNode.tag === 'wx-block' ? newRoot : newNode;
+		for (var i = 0; i < root.childNodes.length; ++i) {
+			var child = root.childNodes[i];
+			if (child.nodeType != 1 && child.nodeType != 3)
+				continue;
+			if (child.nodeType == 3 && !child.nodeValue.trim().length)
+				continue;
 			XML2DataTree(child, context, newNode, newLayerOps, newLayerIdx++);
 		}
 	}
@@ -57,16 +65,18 @@ function parseElementNode(node, data, layerOps, layerIdx) {
 	for (var i = 0; i < node.attributes.length; ++i) {
 		var attr = node.attributes[i];
 		var value = stringEvaluate(attr.value.trim(), data, attr.name === 'data');
-		if (attr.name.split('-').length > 1) {
-			var newAttrName = attr.name.split('-')
+		var name = attr.name;
+		if (name.split('-').length > 1)
+			name = name.split('-')
 				.map((p, i) => i != 0 ? p[0].toUpperCase() + p.substring(1) : p)
 				.join('');
-			ret.attr[newAttrName] = value;
+		if (ret.items && ret.array) {
+			ret.array.forEach(c => c.attr[name] = value);
 		} else {
-			ret.attr[attr.name] = value;
+			ret.attr[name] = value;
 		}
-		if (attr.name.startsWith('wx:')) {
-			ret = processWxAttribute(attr.name, ret, layerOps, layerIdx);
+		if (name.startsWith('wx:')) {
+			ret = processWxAttribute(name, value, ret, layerOps, layerIdx);
 			if (!ret)
 				break;
 		}
@@ -74,16 +84,16 @@ function parseElementNode(node, data, layerOps, layerIdx) {
 	return ret;
 }
 
-function processWxAttribute(name, node, operations, idx) {
+function processWxAttribute(name, value, node, operations, idx) {
 	switch (name) {
 		case 'wx:if':
-			var condition = !!node.attr[name];
+			var condition = !!value;
 			operations[idx] = ['if', condition];
 			if (condition == false)
 				return;
 			break;
 		case 'wx:elif':
-			var condition = !!node.attr[name];
+			var condition = !!value;
 			operations[idx] = ['elif', condition];
 			if (operations[idx-1] == undefined || operations[idx-1][0] != 'if')
 				throw new Error('no corresponding wx:if found');
@@ -97,12 +107,29 @@ function processWxAttribute(name, node, operations, idx) {
 				return;
 			break;
 		case 'wx:for':
-			var items = Array.isArray(node.attr[name]) ? node.attr[name] : [];
+			var items = Array.isArray(value) ? value : [];
 			delete node.attr[name];
 			node = {
+				tag: node.tag,
+				indexName: node.indexName ? node.indexName : 'index',
+				itemName: node.itemName ? node.itemName : 'item',
 				items: items,
 				array: items.map(i => { return { tag: node.tag, attr: node.attr, children: [] } })
 			};
+			break;
+		case 'wx:forIndex':
+			node.indexName = value;
+			if (node.items && node.array)
+				node.array.forEach(c => delete c.attr[name]);
+			else if (node.attr)
+				node.attr[name];
+			break;
+		case 'wx:forItem':
+			node.itemName = value;
+			if (node.items && node.array)
+				node.array.forEach(c => delete c.attr[name]);
+			else if (node.attr)
+				node.attr[name];
 			break;
 	}
 	return node;
