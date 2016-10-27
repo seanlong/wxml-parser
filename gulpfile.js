@@ -13,7 +13,8 @@ var plugins = require('gulp-load-plugins')();
 
 var options = {
   debug: false,
-  fullPaths: false
+  fullPaths: false,
+  standalone: 'wxmlparser'
 };
 
 function createBundler(entry) {
