@@ -1,0 +1,32 @@
+{
+  "name": "wxml-parser",
+  "version": "0.0.1",
+  "description": "wxapp WXML(HTML like layout file) parser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wx",
+    "wx-app",
+    "wxml",
+    "virtual-dom"
+  ],
+  "author": {
+    "name": "Long Xiang",
+    "email": "seanlong@outlook.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.1",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.2.0",
+    "mocha": "^3.1.2",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
+  },
+  "dependencies": {
+  }
+}
