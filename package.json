@@ -16,6 +16,10 @@
     "name": "Long Xiang",
     "email": "seanlong@outlook.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanlong/wxml-parser.git"
+  },
   "license": "MIT",
   "devDependencies": {
     "babel-preset-es2015": "^6.18.0",
