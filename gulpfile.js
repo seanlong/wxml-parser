@@ -51,3 +51,8 @@ gulp.task('test', function() {
   });
   bundle(bundler, 'test.js');
 });
+
+gulp.task('default', function() {
+  var bundler = createBundler('test/test.js');
+  return bundle(bundler, 'test.js')
+});

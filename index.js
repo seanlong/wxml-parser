@@ -1,5 +1,7 @@
 'use strict';
 
+require('./dom_parser.js')
+
 function XML2DataTree(root, context, newRoot, layerOps, layerIdx) {
 	if (!newRoot)
 		newRoot = { tag: 'body', children: [] };
@@ -75,7 +77,8 @@ function parseElementNode(node, data, layerOps, layerIdx) {
 		} else {
 			ret.attr[name] = value;
 		}
-		if (name.startsWith('wx:')) {
+		//if (name.startsWith('wx:')) {
+		if (name.substring(0, 3) === 'wx:') {
 			ret = processWxAttribute(name, value, ret, layerOps, layerIdx);
 			if (!ret)
 				break;
