@@ -1,6 +1,6 @@
 {
   "name": "wxml-parser",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "wxapp WXML(HTML like layout file) parser",
   "main": "index.js",
   "scripts": {
