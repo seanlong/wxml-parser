@@ -1,4 +1,7 @@
-# wxml-parser
+wxml-parser
+=======
+
+[![Build Status](https://travis-ci.org/seanlong/wxml-parser.svg?branch=master)](https://travis-ci.org/seanlong/wxml-parser)
 
 ## What
 这是一个微信小程序[WXML](http://mp.weixin.qq.com/debug/wxadoc/dev/framework/view/wxml/)文件的JavaScript parser实现。输出微信官方提供的native可执行文件类似的数据结构。  
